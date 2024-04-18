@@ -25,14 +25,15 @@
 # пока один из героев не умрет. Выводит информацию о каждом ходе
 # (кто атаковал и сколько здоровья осталось у противника) и объявляет победителя.
 
-class Hero:
-    # Нужно использовать двойное подчеркивание для init. Определяем конструктор.
-    def __init__(self, name):
-        self.name = name
-        self.health = 100
-        self.attack_power = 20
+import random
 
-    # Методы должны быть выровнены на одном уровне отступа с методом __init__
+
+class Hero:
+    def __init__(self, name, health=100, attack_power=20):
+        self.name = name
+        self.health = health
+        self.attack_power = attack_power
+
     def attack(self, other):
         other.health -= self.attack_power
         print(f"{self.name} атакует {other.name} и наносит {self.attack_power} урона.")
@@ -40,33 +41,37 @@ class Hero:
     def is_alive(self):
         return self.health > 0
 
-# Класс Game также должен правильно начинаться с отступа на одном уровне с Hero
+
 class Game:
-    def __init__(self, player_name, computer_name):
+    def __init__(self, player_name):
         self.player = Hero(player_name)
-        self.computer = Hero(computer_name)
+        self.computer = Hero("Компьютер")
 
     def start(self):
-        turn = 0
+        print("Начинается игра!")
+        turn = 0  # 0 - ход игрока, 1 - ход компьютера
         while self.player.is_alive() and self.computer.is_alive():
-            if turn % 2 == 0:
+            if turn == 0:
                 self.player.attack(self.computer)
-                if self.computer.is_alive():
-                    print(f"У {self.computer.name} осталось {self.computer.health} здоровья.")
-                else:
-                    print(f"{self.computer.name} повержен!")
+                turn = 1
             else:
                 self.computer.attack(self.player)
-                if self.player.is_alive():
-                    print(f"У {self.player.name} осталось {self.player.health} здоровья.")
-                else:
-                    print(f"{self.player.name} повержен!")
-            turn += 1
+                turn = 0
+            self.status()
+        self.declare_winner()
 
-        winner = self.player if self.player.is_alive() else self.computer
-        print(f"Игра окончена! Победитель: {winner.name}.")
+    def status(self):
+        print(f"Здоровье {self.player.name}: {self.player.health} HP")
+        print(f"Здоровье {self.computer.name}: {self.computer.health} HP")
 
-# Пример использования не должен выполняться при каждом импорте модуля.
-if __name__ == "__main__":
-    game = Game("Игрок", "Компьютер")
-    game.start()
+    def declare_winner(self):
+        if self.player.is_alive():
+            print(f"{self.player.name} победил!")
+        else:
+            print(f"{self.computer.name} победил!")
+
+
+# Запуск игры
+player_name = input("Введите ваше имя: ")
+game = Game(player_name)
+game.start()
